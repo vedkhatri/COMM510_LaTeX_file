@@ -25,7 +25,7 @@
 \section{Introduction}
 The use of Evolutionary Algorithms (EA) have been popular in solving multi-objective optimisation problems (MOP) due to their population-based approach that enables generation of several elements of the Pareto optimal set in a single run. These are particularly effective in solving complex MOPs with very large spaces, uncertainty, noise, disjoint Pareto curves, etc. Some examples of Multi-objective Evolutionary Algorithms (MOEA) are MOGA, NPGA, NSGA, NSGA-II, PAES, SPEA, SPEA2 and $\epsilon$-MOEA\cite{moea2007, deb2002}. Selecting an efficient MOEA towards solving MOPs of complex nature is crucial to yield accurate optimal points, especially when there is a computational cost attached to it. Performance Indicators (PI) are metrics that are helpful in comparing and ranking multiple MOEAs to determine their efficiencies. There are several PIs that exist in the literature in ranking MOEA. These are broadly divided as per cardinality, convergence, distribution, and both convergence and distribution. Their description is provided in \autoref{sec:Background_PI}. This project explores the correlation between the run time and ranking of two MOEAs using different PIs.
 
-\section{Background}
+\section{Background} \label{sec:Background}
 \subsection{Multi-objective Evolutionary Algorithms}
 A multi-objective optimisation problem (MOP) has a number of objective functions which are to be minimised or maximised \cite{deb2001}.\\ A MOP is defined in general form as:
 \begin{align*}
@@ -44,7 +44,7 @@ A solution \textbf{x} is a vector of \textit{n} decision variables: $\textbf{x} 
 Deb \cite{deb2002} lists the challenges that "classical" multi-objective algorithms are faced with -
 \begin{enumerate}
 \item The convergence to an optimal solution depends on the chosen initial solution.
-\item Most algorithms tend to get stuck to a suboptimal solution.
+\item Most algorithms tend to get stuck to a sub-optimal solution.
 \item An algorithm that is efficient in solving one optimisation problem might prove inefficient in solving a different problem.
 \item Algorithms are not efficient in handling problems having a discrete search space.
 \item Algorithms cannot be efficiently used on a parallel machine.
@@ -57,9 +57,9 @@ In such cases, Evolutionary Algorithms prove to be effective in finding optimum 
 \end{enumerate}
 
 The two MOEAs considered in this study are NSGA-II and SPEA2.
-\subsubsection{NSGA-II}
+\subsubsection{NSGA-II} \label{sec:Background_nsgaii}
 Non-dominated Sorting Genetic Algorithm
-\subsubsection{SPEA2}
+\subsubsection{SPEA2} \label{sec:Background_spea2}
 \subsection{Performance Indicators} \label{sec:Background_PI}
 Performance Indicators for MOEAs are broadly categorised into four aspects \cite{audet2021}:
 \begin{enumerate}
@@ -73,7 +73,7 @@ There are several performance indicators described in the literature by various 
 
 \section{Methodology and experimental design}
 \subsection{Problems used}
-There are a range of problems used in this study, extracted from the \textit{jMetalPy} Python module, namely ZDT1, ZDT2, ZDT3, ZDT4, ZDT6, DTLZ1, DTLZ2, DTLZ3, DTLZ4, DTLZ5, DTLZ6, and DTLZ7, to perform analysis. These problem types are diverse in nature, and their characteristics are tabulated below.\\
+There are a range of problems used in this study, extracted from the \textit{jMetalPy} \cite{jmetalpy2019} Python module, namely ZDT1, ZDT2, ZDT3, ZDT4, and ZDT6 to perform analysis. It was attempted to run simulations on DTLZ problems, however, as it was very time-consuming to run a single simulation of a run time as low as 10,000 evaluations and would not have yielded to a visual inspection of set of solutions due to an increase in dimensionality, DTLZ problems are regarded as out-of-scope for this study. The ZDT problem types are, however, diverse in nature, and their characteristics are tabulated below.\\
 \begin{table*}[t]
 \centering
 \begin{tabular}{|c|c|c|c|}
@@ -90,14 +90,26 @@ ZDT6 & 2 & 30 & Non-uniform, unconstrained, non-convex pareto front \\
 \caption{Description of problems considered}
 \end{table*}
 \subsection{MOEAs used}
-The two MOEAs used for analysis is Non-dominated Sorting Genetic Algorithm (NSGA-II) and Strength Pareto Evolutionary Algorithm 2 (SPEA2). Their characteristics were described in section 2. The NSGA-II and SPEA2 methods are pre-defined in the \textit{jMetalPy} Python module, and were utilised with the following arguments to perform analysis.
+The two MOEAs used for analysis is Non-dominated Sorting Genetic Algorithm (NSGA-II) and Strength Pareto Evolutionary Algorithm 2 (SPEA2). Their characteristics were described in \autoref{sec:Background_nsgaii} \autoref{sec:Background_spea2}, respectively. The NSGA-II and SPEA2 methods are pre-defined in the \textit{jMetalPy} Python module, and were utilised with the following arguments to perform analysis.
+\begin{itemize}
+    \item Population Size: 100
+    \item Offspring population size: 100
+    \item Mutation: Polynomial mutation
+    \item Crossover: SBX
+    \item Probability for mutation and crossover: $\frac{1.0}{Number of variables}$
+    \item Distribution indexes for mutation and crossover: $20.0$
+    \item Termination criteria: $\{4000, 8000, 12000, 16000\}$ unless stated otherwise
+\end{itemize}
+
 \subsection{Performance Indicators}
 The three performance indicators used for analysis are IGD (convergence-focussed), $\Delta$-metric (diversity- and distribution-focussed), and hypervolume indicator (convergence- and distribution-focussed).
 \subsubsection{IGD}
 Pymoo contains a pre-defined function to calculate IGD with respect to the true Pareto front, and outputs the measure when compared to each of the algorithm-generated set of solutions in the form of their respective Pareto fronts.
 \subsubsection{$\Delta$-metric}
-The $\Delta$-metric is not defined in any of the MOP libraries present in Python, so this was defined as:
-
+The $\Delta$-metric is not defined in any of the MOP libraries present in Python, so this was defined as\cite{cai2018,yan2007}:
+\begin{equation}
+    \Delta = \frac{d_{l} + d_{f} + \sum_{i=1}^{N-1} |d_{i}-\bar{d}|}{d_{l} + d_{f} + (N-1)\bar{d}}
+\end{equation}
 
 \section{Analysis and results}
 \begin{figure*}
@@ -165,8 +177,8 @@ The $\Delta$-metric is not defined in any of the MOP libraries present in Python
 \end{table*}
 
 \section{Discussion and future work}
-
-\bibliographystyle{ACM-Reference-Format}
+It is apparent that IGD and Hypervolume indicator requires the true Pareto front to be known, as this is used as a reference to compare efficiency of MOEAs. The diversity metric, $\Delta$-metric, is the only exception, where diversity of solutions could be assessed without the need for having any information on the true Pareto front. However, it comes with limitations. Yan \textit{et al.} \cite{yan2007} rightly point this discrepancy of using $\Delta$-metric towards assessing diversity of solutions. 
+\bibliographystyle{unsrt}
 \bibliography{references.bib} 
 
 
